@@ -216,6 +216,37 @@ h1, h2 {
     box-shadow: 0 10px 24px rgba(33, 37, 41, 0.16);
 }
 
+.why-icon {
+    color: #198754;
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.why-icon-lightning {
+    color: #ffc107;
+}
+
+.why-icon-phone {
+    color: #0d6efd;
+}
+
+.insurance-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.insurance-icon-auto {
+    color: #0d6efd;
+}
+
+.insurance-icon-home {
+    color: #198754;
+}
+
+.insurance-icon-life {
+    color: #6f42c1;
+}
+
 /* Accordion */
 .accordion-button {
     font-weight: 500;
