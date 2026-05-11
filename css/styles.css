@@ -1,9 +1,9 @@
 /* Custom Styles for Pinnacle Shield Insurance */
 
-* {
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html, body {
@@ -206,6 +206,16 @@ h1, h2 {
     box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
 }
 
+/* Cards */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(33, 37, 41, 0.16);
+}
+
 /* Accordion */
 .accordion-button {
     font-weight: 500;
@@ -225,7 +235,14 @@ h1, h2 {
 /* Footer */
 footer {
     margin-top: auto;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, #212529 0%, #1a1d20 100%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.25);
+}
+
+footer p {
+    margin-bottom: 0;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 /* Responsive adjustments */
@@ -244,6 +261,39 @@ footer {
     .navbar-nav .nav-link:hover,
     .navbar-nav .nav-link.active {
         color: #0d6efd !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .hero-section {
+        min-height: 62vh;
+    }
+
+    .hero-section .container {
+        padding-top: 2rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem;
+    }
+
+    .hero-section .lead {
+        font-size: 1rem;
+    }
+
+    main section {
+        padding: 2.5rem 1rem !important;
+    }
+
+    .row.g-4 {
+        --bs-gutter-x: 1rem;
+        --bs-gutter-y: 1rem;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px rgba(33, 37, 41, 0.14);
     }
 }
 
