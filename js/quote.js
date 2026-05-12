@@ -404,6 +404,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Event listeners ---
 
+    document.getElementById('getAnotherQuote').addEventListener('click', function () {
+        quoteForm.reset();
+        clearAllErrors();
+        Object.values(sections).forEach(section => {
+            section.el.classList.add('hidden');
+            section.requiredIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.required = false;
+            });
+        });
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('resultBreakdown').innerHTML = '';
+        quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     document.querySelectorAll('input[name="insuranceType"]').forEach(radio => {
         radio.addEventListener('change', function () {
             showSection(this.value);
