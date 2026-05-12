@@ -318,12 +318,46 @@
                         </div>
                     </div>
 
-                    <div id="quoteResult" class="card shadow-sm mt-4 d-none">
-                        <div class="card-body p-4">
-                            <h2 class="h4 card-title mb-3">Your Estimated Quote</h2>
-                            <p class="mb-2">Name: <strong id="resultName"></strong></p>
-                            <p class="mb-2">Coverage Type: <strong id="resultType"></strong></p>
-                            <p class="mb-0 fs-5">Estimated Monthly Premium: <strong id="resultPrice" class="text-primary"></strong></p>
+                    <div id="quoteResult" class="mt-4 d-none">
+                        <!-- Summary card -->
+                        <div class="card shadow-sm mb-3">
+                            <div class="card-body p-4">
+                                <h2 class="h4 card-title mb-3">Your Estimated Quote</h2>
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <p class="mb-1 text-muted small">Customer</p>
+                                        <p class="mb-0 fw-semibold" id="resultName"></p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="mb-1 text-muted small">Coverage Type</p>
+                                        <p class="mb-0 fw-semibold" id="resultType"></p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="mb-1 text-muted small">Monthly Premium</p>
+                                        <p class="mb-0 fs-3 fw-bold text-primary" id="resultPrice"></p>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <p class="mb-1 text-muted small">Annual Premium</p>
+                                        <p class="mb-0 fs-5 fw-semibold text-secondary" id="resultAnnual"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Breakdown card -->
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <h3 class="h5 mb-3">Premium Breakdown</h3>
+                                <table class="table table-striped mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Factor</th>
+                                            <th>Your Info</th>
+                                            <th>Impact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultBreakdown"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
