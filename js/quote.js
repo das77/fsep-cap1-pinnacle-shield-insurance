@@ -376,10 +376,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function addBreakdownRow(tbody, factor, userValue, impact) {
         var row = document.createElement('tr');
-        row.innerHTML =
-            '<td>' + factor + '</td>' +
-            '<td>' + userValue + '</td>' +
-            '<td>' + impact + '</td>';
+        var tdFactor = document.createElement('td');
+        var tdValue = document.createElement('td');
+        var tdImpact = document.createElement('td');
+        tdFactor.textContent = factor;
+        tdValue.textContent = userValue;
+        tdImpact.textContent = impact;
+        row.appendChild(tdFactor);
+        row.appendChild(tdValue);
+        row.appendChild(tdImpact);
         tbody.appendChild(row);
     }
 
