@@ -254,6 +254,29 @@ document.addEventListener('DOMContentLoaded', function () {
         return Math.round(monthly * 100) / 100;
     }
 
+    function calculateHomeQuote(data) {
+        const base = (Number(data.homeValue) * 0.003) / 12;
+
+        const yearBuilt = Number(data.yearBuilt);
+        const yearFactor = yearBuilt < 1970 ? 1.4 : yearBuilt <= 1999 ? 1.1 : 1.0;
+
+        const constructionFactors = { 'wood': 1.2, 'brick': 1.0, 'concrete': 0.9, 'steel': 0.85 };
+
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+
+        const sizePremium = Number(data.squareFootage) * 0.01;
+
+        let monthly = base
+            * yearFactor
+            * (constructionFactors[data.constructionType] ?? 1.0)
+            * (data.securitySystem ? 0.95 : 1.0)
+            * (data.fireSprinklers ? 0.92 : 1.0)
+            * (coverageFactors[data.coverageLevel] ?? 1.0)
+            + sizePremium;
+
+        return Math.round(monthly * 100) / 100;
+    }
+
     function showResult(name, type, monthlyPremium) {
         document.getElementById('resultName').textContent = name;
         document.getElementById('resultType').textContent = type;
@@ -307,6 +330,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     fireSprinklers: document.getElementById('fireSprinklers').checked,
                     coverageLevel: document.querySelector('input[name="homeCoverageLevel"]:checked')?.value,
                 });
+                showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data));
             } else if (insuranceType === 'life') {
                 Object.assign(data, {
                     fullName: document.getElementById('lifeFullName').value,
