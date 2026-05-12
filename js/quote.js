@@ -277,6 +277,29 @@ document.addEventListener('DOMContentLoaded', function () {
         return Math.round(monthly * 100) / 100;
     }
 
+    function calculateLifeQuote(data) {
+        const base = (Number(data.coverageAmount) * 0.0005) / 12;
+
+        const age = Number(data.age);
+        const ageFactor = age <= 30 ? 1.0 : age <= 45 ? 1.5 : age <= 60 ? 2.5 : 4.0;
+
+        const exerciseFactors = { 'rarely': 1.3, '1-2': 1.1, '3-4': 1.0, '5+': 0.9 };
+
+        const genderFactors = { 'male': 1.1, 'female': 1.0, 'non-binary': 1.05 };
+
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+
+        const monthly = base
+            * ageFactor
+            * (data.smoker === 'yes' ? 2.0 : 1.0)
+            * (exerciseFactors[data.exerciseFrequency] ?? 1.0)
+            * (data.preexistingConditions ? 1.5 : 1.0)
+            * (genderFactors[data.gender] ?? 1.0)
+            * (coverageFactors[data.coverageLevel] ?? 1.0);
+
+        return Math.round(monthly * 100) / 100;
+    }
+
     function showResult(name, type, monthlyPremium) {
         document.getElementById('resultName').textContent = name;
         document.getElementById('resultType').textContent = type;
@@ -343,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     preexistingConditions: document.getElementById('preexistingConditions').checked,
                     coverageLevel: document.querySelector('input[name="lifeCoverageLevel"]:checked')?.value,
                 });
+                showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data));
             }
 
             console.log('Quote Form Submitted:', data);
