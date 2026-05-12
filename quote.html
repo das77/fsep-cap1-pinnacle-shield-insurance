@@ -43,29 +43,205 @@
             <div class="row">
                 <div class="col-lg-8 mx-auto">
                     <h1 class="mb-4">Get Your Insurance Quote</h1>
-                    <p class="lead mb-4">Fill out the form below to receive a personalized quote.</p>
-                    
-                    <form id="quoteForm">
-                        <div class="mb-3">
-                            <label for="fullName" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="fullName" placeholder="Enter your full name" required>
+                    <div class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <p class="lead mb-4">Fill out the form below to receive a personalized quote.</p>
+                            <form id="quoteForm">
+                                <div class="mb-4">
+                                    <label class="form-label">Insurance Type</label>
+                                    <div class="row g-3">
+                                        <div class="col-4">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="typeAuto" value="auto" required>
+                                            <label class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center gap-2" for="typeAuto">
+                                                <span style="font-size:1.75rem">🚗</span>
+                                                <span>Auto</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="typeHome" value="home">
+                                            <label class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center gap-2" for="typeHome">
+                                                <span style="font-size:1.75rem">🏠</span>
+                                                <span>Home</span>
+                                            </label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="radio" class="btn-check" name="insuranceType" id="typeLife" value="life">
+                                            <label class="btn btn-outline-primary w-100 py-3 d-flex flex-column align-items-center gap-2" for="typeLife">
+                                                <span style="font-size:1.75rem">❤️</span>
+                                                <span>Life</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Auto Insurance Fields -->
+                                <div id="autoFields" class="d-none">
+                                    <hr class="my-3">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-6">
+                                            <label for="fullName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Enter your full name" minlength="2">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="age" class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="age" name="age" min="16" max="100" placeholder="e.g. 30">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="zipCode" class="form-label">ZIP Code</label>
+                                            <input type="text" class="form-control" id="zipCode" name="zipCode" pattern="\d{5}" maxlength="5" placeholder="12345">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-3">
+                                            <label for="vehicleYear" class="form-label">Vehicle Year</label>
+                                            <input type="number" class="form-control" id="vehicleYear" name="vehicleYear" min="1990" max="2026" placeholder="e.g. 2022">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="vehicleMake" class="form-label">Vehicle Make</label>
+                                            <select class="form-select" id="vehicleMake" name="vehicleMake">
+                                                <option value="">Select a make...</option>
+                                                <option value="toyota">Toyota</option>
+                                                <option value="honda">Honda</option>
+                                                <option value="ford">Ford</option>
+                                                <option value="bmw">BMW</option>
+                                                <option value="tesla">Tesla</option>
+                                                <option value="other">Other</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-5">
+                                            <label for="vehicleModel" class="form-label">Vehicle Model</label>
+                                            <input type="text" class="form-control" id="vehicleModel" name="vehicleModel" placeholder="e.g. Camry">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-6">
+                                            <label for="annualMileage" class="form-label">Annual Mileage</label>
+                                            <select class="form-select" id="annualMileage" name="annualMileage">
+                                                <option value="">Select mileage range...</option>
+                                                <option value="under5000">Under 5,000</option>
+                                                <option value="5000-10000">5,000–10,000</option>
+                                                <option value="10001-15000">10,001–15,000</option>
+                                                <option value="15001-20000">15,001–20,000</option>
+                                                <option value="over20000">Over 20,000</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="drivingRecord" class="form-label">Driving Record</label>
+                                            <select class="form-select" id="drivingRecord" name="drivingRecord">
+                                                <option value="">Select driving record...</option>
+                                                <option value="clean">Clean</option>
+                                                <option value="1ticket">1 Ticket</option>
+                                                <option value="2tickets">2+ Tickets</option>
+                                                <option value="accident">Accident in Last 3 Years</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Coverage Level</label>
+                                        <div class="row g-3">
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="autoCoverageLevel" id="autoCoverageBasic" value="basic">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="autoCoverageBasic">Basic</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="autoCoverageLevel" id="autoCoverageStandard" value="standard">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="autoCoverageStandard">Standard</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="autoCoverageLevel" id="autoCoveragePremium" value="premium">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="autoCoveragePremium">Premium</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Home Insurance Fields -->
+                                <div id="homeFields" class="d-none">
+                                    <hr class="my-3">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-6">
+                                            <label for="homeFullName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="homeFullName" name="homeFullName" placeholder="Enter your full name" minlength="2">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="homeAge" class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="homeAge" name="homeAge" min="18" max="100" placeholder="e.g. 35">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="homeZipCode" class="form-label">ZIP Code</label>
+                                            <input type="text" class="form-control" id="homeZipCode" name="homeZipCode" pattern="\d{5}" maxlength="5" placeholder="12345">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-4">
+                                            <label for="homeValue" class="form-label">Home Value ($)</label>
+                                            <input type="number" class="form-control" id="homeValue" name="homeValue" min="50000" placeholder="e.g. 300000">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="yearBuilt" class="form-label">Year Built</label>
+                                            <input type="number" class="form-control" id="yearBuilt" name="yearBuilt" min="1900" max="2026" placeholder="e.g. 1995">
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="squareFootage" class="form-label">Square Footage</label>
+                                            <input type="number" class="form-control" id="squareFootage" name="squareFootage" min="500" max="10000" placeholder="e.g. 2000">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="constructionType" class="form-label">Construction Type</label>
+                                        <select class="form-select" id="constructionType" name="constructionType">
+                                            <option value="">Select construction type...</option>
+                                            <option value="wood">Wood Frame</option>
+                                            <option value="brick">Brick</option>
+                                            <option value="concrete">Concrete</option>
+                                            <option value="steel">Steel</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Discounts</label>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="securitySystem" name="securitySystem" value="yes">
+                                            <label class="form-check-label" for="securitySystem">Has Security System</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" id="fireSprinklers" name="fireSprinklers" value="yes">
+                                            <label class="form-check-label" for="fireSprinklers">Has Fire Sprinklers</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Coverage Level</label>
+                                        <div class="row g-3">
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="homeCoverageLevel" id="homeCoverageBasic" value="basic">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="homeCoverageBasic">Basic</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="homeCoverageLevel" id="homeCoverageStandard" value="standard">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="homeCoverageStandard">Standard</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="homeCoverageLevel" id="homeCoveragePremium" value="premium">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="homeCoveragePremium">Premium</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 mt-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Get Quote</button>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div id="quoteResult" class="card shadow-sm mt-4 d-none">
+                        <div class="card-body p-4">
+                            <h2 class="h4 card-title mb-3">Your Estimated Quote</h2>
+                            <p class="mb-2">Name: <strong id="resultName"></strong></p>
+                            <p class="mb-2">Coverage Type: <strong id="resultType"></strong></p>
+                            <p class="mb-0 fs-5">Estimated Monthly Premium: <strong id="resultPrice" class="text-primary"></strong></p>
                         </div>
-                        <div class="mb-3">
-                            <label for="insuranceType" class="form-label">Insurance Type</label>
-                            <select class="form-select" id="insuranceType" required>
-                                <option value="">Select a type...</option>
-                                <option value="auto">Auto Insurance</option>
-                                <option value="home">Home Insurance</option>
-                                <option value="life">Life Insurance</option>
-                                <option value="health">Health Insurance</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Get Quote</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </section>
