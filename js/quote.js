@@ -221,6 +221,80 @@ document.addEventListener('DOMContentLoaded', function () {
         return valid;
     }
 
+    // --- Breakdown helpers ---
+
+    function row(factor, info, multiplier, customImpact) {
+        if (customImpact !== undefined) return { factor, info, impact: customImpact, cls: 'text-muted' };
+        const impact = '×' + multiplier.toFixed(2);
+        const cls = multiplier > 1.0 ? 'text-danger fw-semibold' : multiplier < 1.0 ? 'text-success fw-semibold' : 'text-muted';
+        return { factor, info, impact, cls };
+    }
+
+    function buildAutoBreakdown(data) {
+        const currentYear = new Date().getFullYear();
+        const age = Number(data.age);
+        const ageFactor = age < 25 ? 1.5 : age <= 65 ? 1.0 : 1.3;
+
+        const vehicleAge = currentYear - Number(data.vehicleYear);
+        const vehicleAgeFactor = vehicleAge < 3 ? 1.3 : vehicleAge <= 10 ? 1.0 : 0.8;
+
+        const mileageFactors = { 'under5000': 0.8, '5000-10000': 1.0, '10001-15000': 1.1, '15001-20000': 1.3, 'over20000': 1.5 };
+        const mileageLabels = { 'under5000': 'Under 5,000 mi/yr', '5000-10000': '5,000–10,000 mi/yr', '10001-15000': '10,001–15,000 mi/yr', '15001-20000': '15,001–20,000 mi/yr', 'over20000': 'Over 20,000 mi/yr' };
+        const recordFactors = { 'clean': 1.0, '1ticket': 1.2, '2tickets': 1.5, 'accident': 1.8 };
+        const recordLabels = { 'clean': 'Clean', '1ticket': '1 ticket', '2tickets': '2+ tickets', 'accident': 'Recent accident' };
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+
+        return [
+            row('Base Rate', '—', null, '$75.00/mo'),
+            row('Driver Age', `${age} yrs`, ageFactor),
+            row('Vehicle', `${data.vehicleYear} ${data.vehicleMake} ${data.vehicleModel} (${vehicleAge} yr${vehicleAge !== 1 ? 's' : ''} old)`, vehicleAgeFactor),
+            row('Annual Mileage', mileageLabels[data.annualMileage] ?? data.annualMileage, mileageFactors[data.annualMileage] ?? 1.0),
+            row('Driving Record', recordLabels[data.drivingRecord] ?? data.drivingRecord, recordFactors[data.drivingRecord] ?? 1.0),
+            row('Coverage Level', data.coverageLevel.charAt(0).toUpperCase() + data.coverageLevel.slice(1), coverageFactors[data.coverageLevel] ?? 1.0),
+        ];
+    }
+
+    function buildHomeBreakdown(data) {
+        const base = (Number(data.homeValue) * 0.003) / 12;
+        const yearBuilt = Number(data.yearBuilt);
+        const yearFactor = yearBuilt < 1970 ? 1.4 : yearBuilt <= 1999 ? 1.1 : 1.0;
+        const constructionFactors = { 'wood': 1.2, 'brick': 1.0, 'concrete': 0.9, 'steel': 0.85 };
+        const constructionLabels = { 'wood': 'Wood Frame', 'brick': 'Brick', 'concrete': 'Concrete', 'steel': 'Steel' };
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+        const sizePremium = Number(data.squareFootage) * 0.01;
+
+        return [
+            row('Home Value', '$' + Number(data.homeValue).toLocaleString(), null, `Base: $${base.toFixed(2)}/mo`),
+            row('Year Built', data.yearBuilt, yearFactor),
+            row('Construction', constructionLabels[data.constructionType] ?? data.constructionType, constructionFactors[data.constructionType] ?? 1.0),
+            row('Square Footage', Number(data.squareFootage).toLocaleString() + ' sq ft', null, `+$${sizePremium.toFixed(2)}/mo`),
+            row('Security System', data.securitySystem ? 'Yes' : 'No', data.securitySystem ? 0.95 : 1.0),
+            row('Fire Sprinklers', data.fireSprinklers ? 'Yes' : 'No', data.fireSprinklers ? 0.92 : 1.0),
+            row('Coverage Level', data.coverageLevel.charAt(0).toUpperCase() + data.coverageLevel.slice(1), coverageFactors[data.coverageLevel] ?? 1.0),
+        ];
+    }
+
+    function buildLifeBreakdown(data) {
+        const base = (Number(data.coverageAmount) * 0.0005) / 12;
+        const age = Number(data.age);
+        const ageFactor = age <= 30 ? 1.0 : age <= 45 ? 1.5 : age <= 60 ? 2.5 : 4.0;
+        const exerciseFactors = { 'rarely': 1.3, '1-2': 1.1, '3-4': 1.0, '5+': 0.9 };
+        const exerciseLabels = { 'rarely': 'Rarely', '1-2': '1–2 times/week', '3-4': '3–4 times/week', '5+': '5+ times/week' };
+        const genderFactors = { 'male': 1.1, 'female': 1.0, 'non-binary': 1.05 };
+        const genderLabels = { 'male': 'Male', 'female': 'Female', 'non-binary': 'Non-binary' };
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+
+        return [
+            row('Coverage Amount', '$' + Number(data.coverageAmount).toLocaleString(), null, `Base: $${base.toFixed(2)}/mo`),
+            row('Age', `${age} yrs`, ageFactor),
+            row('Smoker', data.smoker === 'yes' ? 'Yes' : 'No', data.smoker === 'yes' ? 2.0 : 1.0),
+            row('Exercise Frequency', exerciseLabels[data.exerciseFrequency] ?? data.exerciseFrequency, exerciseFactors[data.exerciseFrequency] ?? 1.0),
+            row('Pre-existing Conditions', data.preexistingConditions ? 'Yes' : 'No', data.preexistingConditions ? 1.5 : 1.0),
+            row('Gender', genderLabels[data.gender] ?? data.gender, genderFactors[data.gender] ?? 1.0),
+            row('Coverage Level', data.coverageLevel.charAt(0).toUpperCase() + data.coverageLevel.slice(1), coverageFactors[data.coverageLevel] ?? 1.0),
+        ];
+    }
+
     // --- Calculators ---
 
     function calculateAutoQuote(data) {
@@ -300,11 +374,30 @@ document.addEventListener('DOMContentLoaded', function () {
         return Math.round(monthly * 100) / 100;
     }
 
-    function showResult(name, type, monthlyPremium) {
+    function addBreakdownRow(tbody, factor, userValue, impact) {
+        var row = document.createElement('tr');
+        row.innerHTML =
+            '<td>' + factor + '</td>' +
+            '<td>' + userValue + '</td>' +
+            '<td>' + impact + '</td>';
+        tbody.appendChild(row);
+    }
+
+    function showResult(name, type, monthly, breakdown) {
+        const fmt = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
         document.getElementById('resultName').textContent = name;
         document.getElementById('resultType').textContent = type;
-        document.getElementById('resultPrice').textContent =
-            '$' + monthlyPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/mo';
+        document.getElementById('resultPrice').textContent = fmt(monthly) + '/mo';
+        document.getElementById('resultAnnual').textContent = fmt(monthly * 12) + '/yr';
+
+        const tbody = document.getElementById('resultBreakdown');
+        tbody.innerHTML = '';
+        breakdown.forEach(({ factor, info, impact, cls }) => {
+            addBreakdownRow(tbody, factor, info, impact);
+            if (cls) tbody.lastElementChild.lastElementChild.className = cls;
+        });
+
         document.getElementById('quoteResult').classList.remove('d-none');
         document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -339,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     drivingRecord: document.getElementById('drivingRecord').value,
                     coverageLevel: document.querySelector('input[name="autoCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data));
+                showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data), buildAutoBreakdown(data));
             } else if (insuranceType === 'home') {
                 Object.assign(data, {
                     fullName: document.getElementById('homeFullName').value,
@@ -353,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     fireSprinklers: document.getElementById('fireSprinklers').checked,
                     coverageLevel: document.querySelector('input[name="homeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data));
+                showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data), buildHomeBreakdown(data));
             } else if (insuranceType === 'life') {
                 Object.assign(data, {
                     fullName: document.getElementById('lifeFullName').value,
@@ -366,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     preexistingConditions: document.getElementById('preexistingConditions').checked,
                     coverageLevel: document.querySelector('input[name="lifeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data));
+                showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data), buildLifeBreakdown(data));
             }
 
             console.log('Quote Form Submitted:', data);
