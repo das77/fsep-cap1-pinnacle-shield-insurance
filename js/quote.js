@@ -87,14 +87,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Per-type validators ---
 
     const ZIP_RE = /^\d{5}$/;
-    const NAME_RE = /^[a-zA-Z\s'\-]+$/;
+    const NAME_RE = /^[a-zA-Z'\-]+(\s+[a-zA-Z'\-]+)+$/;
 
     function validateAuto() {
         let valid = true;
 
         const name = document.getElementById('fullName').value.trim();
         if (name.length < 2) { setError('fullName', 'Full name must be at least 2 characters.'); valid = false; }
-        else if (!NAME_RE.test(name)) { setError('fullName', 'Full name must contain only letters, spaces, hyphens, or apostrophes.'); valid = false; }
+        else if (!NAME_RE.test(name)) { setError('fullName', 'Please enter your first and last name using letters only.'); valid = false; }
         else clearError('fullName');
 
         const age = Number(document.getElementById('age').value);
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const name = document.getElementById('homeFullName').value.trim();
         if (name.length < 2) { setError('homeFullName', 'Full name must be at least 2 characters.'); valid = false; }
-        else if (!NAME_RE.test(name)) { setError('homeFullName', 'Full name must contain only letters, spaces, hyphens, or apostrophes.'); valid = false; }
+        else if (!NAME_RE.test(name)) { setError('homeFullName', 'Please enter your first and last name using letters only.'); valid = false; }
         else clearError('homeFullName');
 
         const age = Number(document.getElementById('homeAge').value);
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const name = document.getElementById('lifeFullName').value.trim();
         if (name.length < 2) { setError('lifeFullName', 'Full name must be at least 2 characters.'); valid = false; }
-        else if (!NAME_RE.test(name)) { setError('lifeFullName', 'Full name must contain only letters, spaces, hyphens, or apostrophes.'); valid = false; }
+        else if (!NAME_RE.test(name)) { setError('lifeFullName', 'Please enter your first and last name using letters only.'); valid = false; }
         else clearError('lifeFullName');
 
         const age = Number(document.getElementById('lifeAge').value);
