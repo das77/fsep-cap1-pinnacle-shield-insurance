@@ -112,7 +112,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!document.getElementById('vehicleMake').value) { setError('vehicleMake', 'Please select a vehicle make.'); valid = false; }
         else clearError('vehicleMake');
 
-        if (!document.getElementById('vehicleModel').value.trim()) { setError('vehicleModel', 'Vehicle model is required.'); valid = false; }
+        const model = document.getElementById('vehicleModel').value.trim();
+        if (!model) { setError('vehicleModel', 'Vehicle model is required.'); valid = false; }
+        else if (model.length < 2) { setError('vehicleModel', 'Vehicle model must be at least 2 characters.'); valid = false; }
+        else if (!/^[a-zA-Z0-9\s\-]+$/.test(model)) { setError('vehicleModel', 'Vehicle model must contain only letters, numbers, spaces, or hyphens.'); valid = false; }
         else clearError('vehicleModel');
 
         if (!document.getElementById('annualMileage').value) { setError('annualMileage', 'Please select an annual mileage range.'); valid = false; }
