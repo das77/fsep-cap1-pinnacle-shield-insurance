@@ -221,6 +221,48 @@ document.addEventListener('DOMContentLoaded', function () {
         return valid;
     }
 
+    // --- Calculators ---
+
+    function calculateAutoQuote(data) {
+        const BASE = 75;
+        const currentYear = new Date().getFullYear();
+
+        const age = Number(data.age);
+        const ageFactor = age < 25 ? 1.5 : age <= 65 ? 1.0 : 1.3;
+
+        const vehicleAge = currentYear - Number(data.vehicleYear);
+        const vehicleAgeFactor = vehicleAge < 3 ? 1.3 : vehicleAge <= 10 ? 1.0 : 0.8;
+
+        const mileageFactors = {
+            'under5000': 0.8, '5000-10000': 1.0,
+            '10001-15000': 1.1, '15001-20000': 1.3, 'over20000': 1.5,
+        };
+
+        const recordFactors = {
+            'clean': 1.0, '1ticket': 1.2, '2tickets': 1.5, 'accident': 1.8,
+        };
+
+        const coverageFactors = { 'basic': 0.8, 'standard': 1.0, 'premium': 1.4 };
+
+        const monthly = BASE
+            * ageFactor
+            * vehicleAgeFactor
+            * (mileageFactors[data.annualMileage] ?? 1.0)
+            * (recordFactors[data.drivingRecord] ?? 1.0)
+            * (coverageFactors[data.coverageLevel] ?? 1.0);
+
+        return Math.round(monthly * 100) / 100;
+    }
+
+    function showResult(name, type, monthlyPremium) {
+        document.getElementById('resultName').textContent = name;
+        document.getElementById('resultType').textContent = type;
+        document.getElementById('resultPrice').textContent =
+            '$' + monthlyPremium.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '/mo';
+        document.getElementById('quoteResult').classList.remove('d-none');
+        document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     // --- Event listeners ---
 
     document.querySelectorAll('input[name="insuranceType"]').forEach(radio => {
@@ -251,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     drivingRecord: document.getElementById('drivingRecord').value,
                     coverageLevel: document.querySelector('input[name="autoCoverageLevel"]:checked')?.value,
                 });
+                showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data));
             } else if (insuranceType === 'home') {
                 Object.assign(data, {
                     fullName: document.getElementById('homeFullName').value,
@@ -279,15 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             console.log('Quote Form Submitted:', data);
-
-            quoteForm.reset();
-            Object.values(sections).forEach(section => {
-                section.el.classList.add('hidden');
-                section.requiredIds.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.required = false;
-                });
-            });
         });
     }
 });
