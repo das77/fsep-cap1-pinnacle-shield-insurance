@@ -225,6 +225,90 @@
                                     </div>
                                 </div>
 
+                                <!-- Life Insurance Fields -->
+                                <div id="lifeFields" class="d-none">
+                                    <hr class="my-3">
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-6">
+                                            <label for="lifeFullName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="lifeFullName" name="lifeFullName" placeholder="Enter your full name" minlength="2">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="lifeAge" class="form-label">Age</label>
+                                            <input type="number" class="form-control" id="lifeAge" name="lifeAge" min="18" max="85" placeholder="e.g. 40">
+                                        </div>
+                                        <div class="col-sm-3">
+                                            <label for="lifeZipCode" class="form-label">ZIP Code</label>
+                                            <input type="text" class="form-control" id="lifeZipCode" name="lifeZipCode" pattern="\d{5}" maxlength="5" placeholder="12345">
+                                        </div>
+                                    </div>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-sm-4">
+                                            <label for="lifeGender" class="form-label">Gender</label>
+                                            <select class="form-select" id="lifeGender" name="lifeGender">
+                                                <option value="">Select gender...</option>
+                                                <option value="male">Male</option>
+                                                <option value="female">Female</option>
+                                                <option value="non-binary">Non-binary</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="lifeCoverageAmount" class="form-label">Coverage Amount</label>
+                                            <select class="form-select" id="lifeCoverageAmount" name="lifeCoverageAmount">
+                                                <option value="">Select amount...</option>
+                                                <option value="100000">$100,000</option>
+                                                <option value="250000">$250,000</option>
+                                                <option value="500000">$500,000</option>
+                                                <option value="1000000">$1,000,000</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4">
+                                            <label for="exerciseFrequency" class="form-label">Exercise Frequency</label>
+                                            <select class="form-select" id="exerciseFrequency" name="exerciseFrequency">
+                                                <option value="">Select frequency...</option>
+                                                <option value="rarely">Rarely</option>
+                                                <option value="1-2">1–2 times/week</option>
+                                                <option value="3-4">3–4 times/week</option>
+                                                <option value="5+">5+ times/week</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Smoker?</label>
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" name="lifeSmoker" id="lifeSmokerYes" value="yes">
+                                            <label class="btn btn-outline-secondary" for="lifeSmokerYes">Yes</label>
+                                            <input type="radio" class="btn-check" name="lifeSmoker" id="lifeSmokerNo" value="no">
+                                            <label class="btn btn-outline-secondary" for="lifeSmokerNo">No</label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="preexistingConditions" name="preexistingConditions" value="yes">
+                                            <label class="form-check-label" for="preexistingConditions">
+                                                Pre-existing Conditions <span class="text-muted small">(may increase premium)</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Coverage Level</label>
+                                        <div class="row g-3">
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="lifeCoverageLevel" id="lifeCoverageBasic" value="basic">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="lifeCoverageBasic">Basic</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="lifeCoverageLevel" id="lifeCoverageStandard" value="standard">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="lifeCoverageStandard">Standard</label>
+                                            </div>
+                                            <div class="col-4">
+                                                <input type="radio" class="btn-check" name="lifeCoverageLevel" id="lifeCoveragePremium" value="premium">
+                                                <label class="btn btn-outline-secondary w-100 py-2" for="lifeCoveragePremium">Premium</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3 mt-3">
                                     <label for="email" class="form-label">Email Address</label>
                                     <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
