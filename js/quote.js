@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else clearError('age');
 
         if (!ZIP_RE.test(document.getElementById('zipCode').value.trim())) {
-            setError('zipCode', 'ZIP code must be exactly 5 digits.'); valid = false;
+            setError('zipCode', 'Please enter a valid ZIP code made of 5 numbers.'); valid = false;
         } else clearError('zipCode');
 
         const year = Number(document.getElementById('vehicleYear').value);
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else clearError('homeAge');
 
         if (!ZIP_RE.test(document.getElementById('homeZipCode').value.trim())) {
-            setError('homeZipCode', 'ZIP code must be exactly 5 digits.'); valid = false;
+            setError('homeZipCode', 'Please enter a valid ZIP code made of 5 numbers.'); valid = false;
         } else clearError('homeZipCode');
 
         const homeVal = Number(document.getElementById('homeValue').value);
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
         else clearError('lifeAge');
 
         if (!ZIP_RE.test(document.getElementById('lifeZipCode').value.trim())) {
-            setError('lifeZipCode', 'ZIP code must be exactly 5 digits.'); valid = false;
+            setError('lifeZipCode', 'Please enter a valid ZIP code made of 5 numbers.'); valid = false;
         } else clearError('lifeZipCode');
 
         if (!document.getElementById('lifeGender').value) { setError('lifeGender', 'Please select a gender.'); valid = false; }
