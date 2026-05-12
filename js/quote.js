@@ -1,23 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
     const sections = {
         auto: {
-            el: document.getElementById('autoFields'),
+            el: document.getElementById('auto-fields'),
             requiredIds: ['fullName', 'age', 'zipCode', 'vehicleYear', 'vehicleMake', 'vehicleModel', 'annualMileage', 'drivingRecord'],
         },
         home: {
-            el: document.getElementById('homeFields'),
+            el: document.getElementById('home-fields'),
             requiredIds: ['homeFullName', 'homeAge', 'homeZipCode', 'homeValue', 'yearBuilt', 'squareFootage', 'constructionType'],
         },
         life: {
-            el: document.getElementById('lifeFields'),
+            el: document.getElementById('life-fields'),
             requiredIds: ['lifeFullName', 'lifeAge', 'lifeZipCode', 'lifeGender', 'lifeCoverageAmount', 'exerciseFrequency'],
         },
     };
 
+    const quoteForm = document.getElementById('quoteForm');
+
     function showSection(type) {
         Object.entries(sections).forEach(([key, section]) => {
             const active = key === type;
-            section.el.classList.toggle('d-none', !active);
+            section.el.classList.toggle('hidden', !active);
             section.requiredIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.required = active;
@@ -25,13 +27,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function clearValidation() {
+        if (!quoteForm) return;
+        quoteForm.classList.remove('was-validated');
+        quoteForm.querySelectorAll('input, select, textarea').forEach(el => {
+            el.setCustomValidity('');
+        });
+    }
+
     document.querySelectorAll('input[name="insuranceType"]').forEach(radio => {
         radio.addEventListener('change', function () {
             showSection(this.value);
+            clearValidation();
         });
     });
-
-    const quoteForm = document.getElementById('quoteForm');
     if (quoteForm) {
         quoteForm.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -83,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             quoteForm.reset();
             Object.values(sections).forEach(section => {
-                section.el.classList.add('d-none');
+                section.el.classList.add('hidden');
                 section.requiredIds.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.required = false;
