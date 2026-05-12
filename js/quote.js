@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', function () {
             el: document.getElementById('homeFields'),
             requiredIds: ['homeFullName', 'homeAge', 'homeZipCode', 'homeValue', 'yearBuilt', 'squareFootage', 'constructionType'],
         },
+        life: {
+            el: document.getElementById('lifeFields'),
+            requiredIds: ['lifeFullName', 'lifeAge', 'lifeZipCode', 'lifeGender', 'lifeCoverageAmount', 'exerciseFrequency'],
+        },
     };
 
     function showSection(type) {
@@ -47,6 +51,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     annualMileage: document.getElementById('annualMileage').value,
                     drivingRecord: document.getElementById('drivingRecord').value,
                     coverageLevel: document.querySelector('input[name="autoCoverageLevel"]:checked')?.value,
+                });
+            } else if (insuranceType === 'life') {
+                Object.assign(data, {
+                    fullName: document.getElementById('lifeFullName').value,
+                    age: document.getElementById('lifeAge').value,
+                    zipCode: document.getElementById('lifeZipCode').value,
+                    gender: document.getElementById('lifeGender').value,
+                    smoker: document.querySelector('input[name="lifeSmoker"]:checked')?.value,
+                    coverageAmount: document.getElementById('lifeCoverageAmount').value,
+                    exerciseFrequency: document.getElementById('exerciseFrequency').value,
+                    preexistingConditions: document.getElementById('preexistingConditions').checked,
+                    coverageLevel: document.querySelector('input[name="lifeCoverageLevel"]:checked')?.value,
                 });
             } else if (insuranceType === 'home') {
                 Object.assign(data, {
