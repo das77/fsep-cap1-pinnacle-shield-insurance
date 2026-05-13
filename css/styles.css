@@ -186,6 +186,27 @@ h1, h2 {
     display: none;
 }
 
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-in {
+    animation: fadeSlideIn 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-in {
+        animation: none;
+    }
+}
+
 @media print {
     /* White background, black text throughout */
     *, *::before, *::after {

@@ -475,8 +475,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.getElementById('quoteComparison').classList.add('d-none');
-        document.getElementById('quoteResult').classList.remove('d-none');
-        document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        var resultEl = document.getElementById('quoteResult');
+        resultEl.classList.remove('d-none');
+        resultEl.classList.remove('animate-in');
+        void resultEl.offsetWidth;
+        resultEl.classList.add('animate-in');
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // --- localStorage helpers ---
