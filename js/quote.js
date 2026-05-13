@@ -513,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.getElementById('quoteComparison').classList.add('d-none');
-        setStep(3);
+        setStep(4);
         var resultEl = document.getElementById('quoteResult');
         resultEl.classList.remove('d-none');
         resultEl.classList.remove('animate-in');
