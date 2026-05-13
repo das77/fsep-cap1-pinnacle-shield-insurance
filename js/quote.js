@@ -639,6 +639,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Event listeners ---
 
+    // Pre-select insurance type from URL param (e.g. quote.html?type=auto)
+    var typeParam = new URLSearchParams(window.location.search).get('type');
+    if (typeParam && ['auto', 'home', 'life'].includes(typeParam)) {
+        var typeRadio = document.getElementById('type' + typeParam.charAt(0).toUpperCase() + typeParam.slice(1));
+        if (typeRadio) {
+            typeRadio.checked = true;
+            showSection(typeParam);
+            setStep(2);
+        }
+    }
+
     renderSavedQuotes();
 
     document.getElementById('saveQuote').addEventListener('click', saveCurrentQuote);
