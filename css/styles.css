@@ -243,26 +243,44 @@ h1, h2 {
         text-shadow: none !important;
     }
 
-    /* Hide everything except the results */
+    /* Hide chrome and form in all print modes */
     .navbar,
     footer,
     #quoteFormCard,
     #comparison-banner,
-    #quoteComparison,
     #savedQuotesSection,
     #quoteResult .mt-3,
     h1.mb-4 {
         display: none !important;
     }
 
-    /* Show the print header and results */
+    /* Show the print header */
     #print-header {
         display: block !important;
     }
 
+    /* Default: show single-quote result, hide comparison */
     #quoteResult {
         display: block !important;
         margin-top: 0 !important;
+    }
+
+    #quoteComparison {
+        display: none !important;
+    }
+
+    /* Comparison print mode: flip visibility */
+    body.printing-comparison #quoteResult {
+        display: none !important;
+    }
+
+    body.printing-comparison #quoteComparison {
+        display: block !important;
+        margin-top: 0 !important;
+    }
+
+    body.printing-comparison #quoteComparison .mt-3 {
+        display: none !important;
     }
 
     /* Clean card borders for print */

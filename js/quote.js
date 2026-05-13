@@ -397,6 +397,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let lastQuoteData = null;
     let savedQuote = null;
+    let compQ1 = null;
+    let compQ2 = null;
 
     function resetForm() {
         quoteForm.reset();
@@ -431,6 +433,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showComparison(q1, q2) {
+        compQ1 = q1;
+        compQ2 = q2;
+
+        var saveBtn1 = document.getElementById('saveCompQ1');
+        var saveBtn2 = document.getElementById('saveCompQ2');
+        saveBtn1.textContent = 'Save Quote 1';
+        saveBtn1.disabled = false;
+        saveBtn2.textContent = 'Save Quote 2';
+        saveBtn2.disabled = false;
+
         populateComparisonColumn('comp-col-1', q1, 'Quote 1');
         populateComparisonColumn('comp-col-2', q2, 'Quote 2');
 
@@ -567,24 +579,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function saveCurrentQuote() {
-        if (!lastQuoteData) return;
+    function saveQuoteData(quoteData) {
         var quotes = getSavedQuotes();
         quotes.push({
             id: Date.now(),
             savedAt: new Date().toLocaleDateString(),
-            name: lastQuoteData.name,
-            type: lastQuoteData.type,
-            monthly: lastQuoteData.monthly,
+            name: quoteData.name,
+            type: quoteData.type,
+            monthly: quoteData.monthly,
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+        renderSavedQuotes();
+    }
+
+    function saveCurrentQuote() {
+        if (!lastQuoteData) return;
+        saveQuoteData(lastQuoteData);
 
         lastQuoteData = null;
         savedQuote = null;
         document.getElementById('quoteResult').classList.add('d-none');
         document.getElementById('resultBreakdown').innerHTML = '';
         resetForm();
-        renderSavedQuotes();
         document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -622,9 +638,33 @@ document.addEventListener('DOMContentLoaded', function () {
         quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
+    document.getElementById('saveCompQ1').addEventListener('click', function () {
+        if (!compQ1) return;
+        saveQuoteData(compQ1);
+        this.textContent = 'Saved ✓';
+        this.disabled = true;
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.getElementById('saveCompQ2').addEventListener('click', function () {
+        if (!compQ2) return;
+        saveQuoteData(compQ2);
+        this.textContent = 'Saved ✓';
+        this.disabled = true;
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.getElementById('printComparison').addEventListener('click', function () {
+        document.body.classList.add('printing-comparison');
+        window.print();
+        document.body.classList.remove('printing-comparison');
+    });
+
     document.getElementById('newComparison').addEventListener('click', function () {
         savedQuote = null;
         lastQuoteData = null;
+        compQ1 = null;
+        compQ2 = null;
         document.getElementById('quoteComparison').classList.add('d-none');
         document.getElementById('comparison-banner').classList.add('d-none');
         resetForm();
