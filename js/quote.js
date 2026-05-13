@@ -395,7 +395,109 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(row);
     }
 
+    let lastQuoteData = null;
+    let savedQuote = null;
+    let compQ1 = null;
+    let compQ2 = null;
+
+    function setStep(n) {
+        var stepsEl = document.getElementById('quoteSteps');
+        if (!stepsEl) return;
+        stepsEl.classList.remove('d-none');
+        for (var i = 1; i <= 3; i++) {
+            var item = document.getElementById('step' + i);
+            if (!item) continue;
+            var circle = item.querySelector('.step-circle');
+            item.classList.remove('active', 'completed');
+            if (i < n) {
+                item.classList.add('completed');
+                circle.textContent = '✓';
+            } else {
+                circle.textContent = i;
+                if (i === n) item.classList.add('active');
+            }
+            item.setAttribute('aria-current', i === n ? 'step' : 'false');
+        }
+        var conn1 = document.getElementById('step-conn-1');
+        var conn2 = document.getElementById('step-conn-2');
+        if (conn1) conn1.classList.toggle('completed', n > 1);
+        if (conn2) conn2.classList.toggle('completed', n > 2);
+    }
+
+    function resetForm() {
+        quoteForm.reset();
+        clearAllErrors();
+        Object.values(sections).forEach(section => {
+            section.el.classList.add('hidden');
+            section.requiredIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.required = false;
+            });
+        });
+        var saveBtn = document.getElementById('saveQuote');
+        saveBtn.textContent = 'Save Quote';
+        saveBtn.disabled = false;
+        setStep(1);
+    }
+
+    function populateComparisonColumn(colId, quote, label) {
+        const fmt = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const col = document.getElementById(colId);
+        col.querySelector('.comp-label').textContent = label;
+        col.querySelector('.comp-name').textContent = quote.name;
+        col.querySelector('.comp-type').textContent = quote.type;
+        col.querySelector('.comp-monthly').textContent = fmt(quote.monthly) + '/mo';
+        col.querySelector('.comp-annual').textContent = fmt(quote.monthly * 12) + '/yr';
+
+        const tbody = col.querySelector('.comp-tbody');
+        tbody.innerHTML = '';
+        quote.breakdown.forEach(({ factor, info, impact, cls }) => {
+            addBreakdownRow(tbody, factor, info, impact);
+            if (cls) tbody.lastElementChild.lastElementChild.className = cls;
+        });
+    }
+
+    function showComparison(q1, q2) {
+        compQ1 = q1;
+        compQ2 = q2;
+
+        var saveBtn1 = document.getElementById('saveCompQ1');
+        var saveBtn2 = document.getElementById('saveCompQ2');
+        saveBtn1.textContent = 'Save Quote 1';
+        saveBtn1.disabled = false;
+        saveBtn2.textContent = 'Save Quote 2';
+        saveBtn2.disabled = false;
+
+        populateComparisonColumn('comp-col-1', q1, 'Quote 1');
+        populateComparisonColumn('comp-col-2', q2, 'Quote 2');
+
+        if (q1.type === q2.type) {
+            const rows1 = document.querySelectorAll('#comp-col-1 .comp-tbody tr');
+            const rows2 = document.querySelectorAll('#comp-col-2 .comp-tbody tr');
+            const len = Math.min(q1.breakdown.length, q2.breakdown.length);
+            for (var i = 0; i < len; i++) {
+                if (q1.breakdown[i].info !== q2.breakdown[i].info) {
+                    rows1[i].classList.add('table-warning');
+                    rows2[i].classList.add('table-warning');
+                }
+            }
+        }
+
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('quoteComparison').classList.remove('d-none');
+        document.getElementById('quoteSteps').classList.add('d-none');
+        document.getElementById('quoteComparison').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function showResult(name, type, monthly, breakdown) {
+        lastQuoteData = { name, type, monthly, breakdown };
+
+        if (savedQuote) {
+            showComparison(savedQuote, lastQuoteData);
+            savedQuote = null;
+            return;
+        }
+
         const fmt = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         document.getElementById('resultName').textContent = name;
@@ -410,24 +512,200 @@ document.addEventListener('DOMContentLoaded', function () {
             if (cls) tbody.lastElementChild.lastElementChild.className = cls;
         });
 
-        document.getElementById('quoteResult').classList.remove('d-none');
-        document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        document.getElementById('quoteComparison').classList.add('d-none');
+        setStep(4);
+        var resultEl = document.getElementById('quoteResult');
+        resultEl.classList.remove('d-none');
+        resultEl.classList.remove('animate-in');
+        void resultEl.offsetWidth;
+        resultEl.classList.add('animate-in');
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // --- localStorage helpers ---
+
+    var STORAGE_KEY = 'psi_saved_quotes';
+
+    function getSavedQuotes() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderSavedQuotes() {
+        var quotes = getSavedQuotes();
+        var section = document.getElementById('savedQuotesSection');
+        var list = document.getElementById('savedQuotesList');
+        var fmt = function (n) {
+            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+
+        list.innerHTML = '';
+
+        if (quotes.length === 0) {
+            section.classList.add('d-none');
+            return;
+        }
+
+        section.classList.remove('d-none');
+
+        quotes.forEach(function (quote) {
+            var card = document.createElement('div');
+            card.className = 'card mb-3 shadow-sm';
+
+            var body = document.createElement('div');
+            body.className = 'card-body d-flex justify-content-between align-items-start';
+
+            var info = document.createElement('div');
+
+            var nameEl = document.createElement('h3');
+            nameEl.className = 'h6 mb-1';
+            nameEl.textContent = quote.name;
+
+            var typeEl = document.createElement('p');
+            typeEl.className = 'text-muted small mb-1';
+            typeEl.textContent = quote.type;
+
+            var dateEl = document.createElement('p');
+            dateEl.className = 'text-muted small mb-0';
+            dateEl.textContent = 'Saved ' + quote.savedAt;
+
+            info.appendChild(nameEl);
+            info.appendChild(typeEl);
+            info.appendChild(dateEl);
+
+            var right = document.createElement('div');
+            right.className = 'text-end d-flex flex-column align-items-end gap-2';
+
+            var monthlyEl = document.createElement('p');
+            monthlyEl.className = 'mb-0 fw-bold text-primary';
+            monthlyEl.textContent = fmt(quote.monthly) + '/mo';
+
+            var annualEl = document.createElement('p');
+            annualEl.className = 'mb-0 text-muted small';
+            annualEl.textContent = fmt(quote.monthly * 12) + '/yr';
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-outline-danger btn-sm';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', function () {
+                deleteQuote(quote.id);
+            });
+
+            right.appendChild(monthlyEl);
+            right.appendChild(annualEl);
+            right.appendChild(deleteBtn);
+
+            body.appendChild(info);
+            body.appendChild(right);
+            card.appendChild(body);
+            list.appendChild(card);
+        });
+    }
+
+    function saveQuoteData(quoteData) {
+        var quotes = getSavedQuotes();
+        quotes.push({
+            id: Date.now(),
+            savedAt: new Date().toLocaleDateString(),
+            name: quoteData.name,
+            type: quoteData.type,
+            monthly: quoteData.monthly,
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+        renderSavedQuotes();
+    }
+
+    function saveCurrentQuote() {
+        if (!lastQuoteData) return;
+        saveQuoteData(lastQuoteData);
+
+        lastQuoteData = null;
+        savedQuote = null;
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('resultBreakdown').innerHTML = '';
+        resetForm();
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function deleteQuote(id) {
+        var quotes = getSavedQuotes().filter(function (q) { return q.id !== id; });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+        renderSavedQuotes();
     }
 
     // --- Event listeners ---
 
+    // Pre-select insurance type from URL param (e.g. quote.html?type=auto)
+    var typeParam = new URLSearchParams(window.location.search).get('type');
+    if (typeParam && ['auto', 'home', 'life'].includes(typeParam)) {
+        var typeRadio = document.getElementById('type' + typeParam.charAt(0).toUpperCase() + typeParam.slice(1));
+        if (typeRadio) {
+            typeRadio.checked = true;
+            showSection(typeParam);
+            setStep(2);
+        }
+    }
+
+    renderSavedQuotes();
+
+    document.getElementById('saveQuote').addEventListener('click', saveCurrentQuote);
+
+    document.getElementById('printQuote').addEventListener('click', function () {
+        window.print();
+    });
+
+    document.getElementById('compareQuotes').addEventListener('click', function () {
+        savedQuote = lastQuoteData;
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('comparison-banner').classList.remove('d-none');
+        resetForm();
+        quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     document.getElementById('getAnotherQuote').addEventListener('click', function () {
-        quoteForm.reset();
-        clearAllErrors();
-        Object.values(sections).forEach(section => {
-            section.el.classList.add('hidden');
-            section.requiredIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.required = false;
-            });
-        });
+        savedQuote = null;
+        lastQuoteData = null;
         document.getElementById('quoteResult').classList.add('d-none');
         document.getElementById('resultBreakdown').innerHTML = '';
+        document.getElementById('comparison-banner').classList.add('d-none');
+        resetForm();
+        quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('saveCompQ1').addEventListener('click', function () {
+        if (!compQ1) return;
+        saveQuoteData(compQ1);
+        this.textContent = 'Saved ✓';
+        this.disabled = true;
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.getElementById('saveCompQ2').addEventListener('click', function () {
+        if (!compQ2) return;
+        saveQuoteData(compQ2);
+        this.textContent = 'Saved ✓';
+        this.disabled = true;
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+
+    document.getElementById('printComparison').addEventListener('click', function () {
+        document.body.classList.add('printing-comparison');
+        window.print();
+        document.body.classList.remove('printing-comparison');
+    });
+
+    document.getElementById('newComparison').addEventListener('click', function () {
+        savedQuote = null;
+        lastQuoteData = null;
+        compQ1 = null;
+        compQ2 = null;
+        document.getElementById('quoteComparison').classList.add('d-none');
+        document.getElementById('comparison-banner').classList.add('d-none');
+        resetForm(); // calls setStep(1) and shows #quoteSteps
         quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
@@ -435,6 +713,7 @@ document.addEventListener('DOMContentLoaded', function () {
         radio.addEventListener('change', function () {
             showSection(this.value);
             clearAllErrors();
+            setStep(2);
         });
     });
 
@@ -459,7 +738,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     drivingRecord: document.getElementById('drivingRecord').value,
                     coverageLevel: document.querySelector('input[name="autoCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data), buildAutoBreakdown(data));
             } else if (insuranceType === 'home') {
                 Object.assign(data, {
                     fullName: document.getElementById('homeFullName').value,
@@ -473,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     fireSprinklers: document.getElementById('fireSprinklers').checked,
                     coverageLevel: document.querySelector('input[name="homeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data), buildHomeBreakdown(data));
             } else if (insuranceType === 'life') {
                 Object.assign(data, {
                     fullName: document.getElementById('lifeFullName').value,
@@ -486,10 +763,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     preexistingConditions: document.getElementById('preexistingConditions').checked,
                     coverageLevel: document.querySelector('input[name="lifeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data), buildLifeBreakdown(data));
             }
 
             console.log('Quote Form Submitted:', data);
+
+            var submitBtn = quoteForm.querySelector('[type="submit"]');
+            var spinner = document.getElementById('quoteSpinner');
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            spinner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            setTimeout(function () {
+                spinner.classList.add('d-none');
+                submitBtn.disabled = false;
+
+                if (insuranceType === 'auto') {
+                    showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data), buildAutoBreakdown(data));
+                } else if (insuranceType === 'home') {
+                    showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data), buildHomeBreakdown(data));
+                } else if (insuranceType === 'life') {
+                    showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data), buildLifeBreakdown(data));
+                }
+            }, 1500);
         });
     }
 });
