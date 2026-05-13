@@ -408,6 +408,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (el) el.required = false;
             });
         });
+        var saveBtn = document.getElementById('saveQuote');
+        saveBtn.textContent = 'Save Quote';
+        saveBtn.disabled = false;
     }
 
     function populateComparisonColumn(colId, quote, label) {
@@ -476,7 +479,122 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
+    // --- localStorage helpers ---
+
+    var STORAGE_KEY = 'psi_saved_quotes';
+
+    function getSavedQuotes() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderSavedQuotes() {
+        var quotes = getSavedQuotes();
+        var section = document.getElementById('savedQuotesSection');
+        var list = document.getElementById('savedQuotesList');
+        var fmt = function (n) {
+            return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        };
+
+        list.innerHTML = '';
+
+        if (quotes.length === 0) {
+            section.classList.add('d-none');
+            return;
+        }
+
+        section.classList.remove('d-none');
+
+        quotes.forEach(function (quote) {
+            var card = document.createElement('div');
+            card.className = 'card mb-3 shadow-sm';
+
+            var body = document.createElement('div');
+            body.className = 'card-body d-flex justify-content-between align-items-start';
+
+            var info = document.createElement('div');
+
+            var nameEl = document.createElement('h3');
+            nameEl.className = 'h6 mb-1';
+            nameEl.textContent = quote.name;
+
+            var typeEl = document.createElement('p');
+            typeEl.className = 'text-muted small mb-1';
+            typeEl.textContent = quote.type;
+
+            var dateEl = document.createElement('p');
+            dateEl.className = 'text-muted small mb-0';
+            dateEl.textContent = 'Saved ' + quote.savedAt;
+
+            info.appendChild(nameEl);
+            info.appendChild(typeEl);
+            info.appendChild(dateEl);
+
+            var right = document.createElement('div');
+            right.className = 'text-end d-flex flex-column align-items-end gap-2';
+
+            var monthlyEl = document.createElement('p');
+            monthlyEl.className = 'mb-0 fw-bold text-primary';
+            monthlyEl.textContent = fmt(quote.monthly) + '/mo';
+
+            var annualEl = document.createElement('p');
+            annualEl.className = 'mb-0 text-muted small';
+            annualEl.textContent = fmt(quote.monthly * 12) + '/yr';
+
+            var deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-outline-danger btn-sm';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', function () {
+                deleteQuote(quote.id);
+            });
+
+            right.appendChild(monthlyEl);
+            right.appendChild(annualEl);
+            right.appendChild(deleteBtn);
+
+            body.appendChild(info);
+            body.appendChild(right);
+            card.appendChild(body);
+            list.appendChild(card);
+        });
+    }
+
+    function saveCurrentQuote() {
+        if (!lastQuoteData) return;
+        var quotes = getSavedQuotes();
+        quotes.push({
+            id: Date.now(),
+            savedAt: new Date().toLocaleDateString(),
+            name: lastQuoteData.name,
+            type: lastQuoteData.type,
+            monthly: lastQuoteData.monthly,
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+
+        lastQuoteData = null;
+        savedQuote = null;
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('resultBreakdown').innerHTML = '';
+        resetForm();
+        renderSavedQuotes();
+        document.getElementById('savedQuotesSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function deleteQuote(id) {
+        var quotes = getSavedQuotes().filter(function (q) { return q.id !== id; });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
+        renderSavedQuotes();
+    }
+
     // --- Event listeners ---
+
+    renderSavedQuotes();
+
+    document.getElementById('saveQuote').addEventListener('click', saveCurrentQuote);
 
     document.getElementById('compareQuotes').addEventListener('click', function () {
         savedQuote = lastQuoteData;
