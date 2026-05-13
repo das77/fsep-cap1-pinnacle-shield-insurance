@@ -490,6 +490,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showResult(name, type, monthly, breakdown) {
+        breakdown = breakdown || [];
         lastQuoteData = { name, type, monthly, breakdown };
 
         if (savedQuote) {
@@ -579,9 +580,16 @@ document.addEventListener('DOMContentLoaded', function () {
             var right = document.createElement('div');
             right.className = 'text-end d-flex flex-column align-items-end gap-2';
 
-            var monthlyEl = document.createElement('p');
-            monthlyEl.className = 'mb-0 fw-bold text-primary';
+            var monthlyEl = document.createElement('button');
+            monthlyEl.type = 'button';
+            monthlyEl.className = 'btn btn-link p-0 fw-bold mb-0';
             monthlyEl.textContent = fmt(quote.monthly) + '/mo';
+            monthlyEl.addEventListener('click', function () {
+                savedQuote = null;
+                lastQuoteData = null;
+                document.getElementById('quoteComparison').classList.add('d-none');
+                showResult(quote.name, quote.type, quote.monthly, quote.breakdown);
+            });
 
             var annualEl = document.createElement('p');
             annualEl.className = 'mb-0 text-muted small';
@@ -614,6 +622,7 @@ document.addEventListener('DOMContentLoaded', function () {
             name: quoteData.name,
             type: quoteData.type,
             monthly: quoteData.monthly,
+            breakdown: quoteData.breakdown || [],
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
         renderSavedQuotes();
