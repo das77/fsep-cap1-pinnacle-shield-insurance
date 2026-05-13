@@ -596,6 +596,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('saveQuote').addEventListener('click', saveCurrentQuote);
 
+    document.getElementById('printQuote').addEventListener('click', function () {
+        window.print();
+    });
+
     document.getElementById('compareQuotes').addEventListener('click', function () {
         savedQuote = lastQuoteData;
         document.getElementById('quoteResult').classList.add('d-none');
