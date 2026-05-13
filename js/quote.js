@@ -395,7 +395,68 @@ document.addEventListener('DOMContentLoaded', function () {
         tbody.appendChild(row);
     }
 
+    let lastQuoteData = null;
+    let savedQuote = null;
+
+    function resetForm() {
+        quoteForm.reset();
+        clearAllErrors();
+        Object.values(sections).forEach(section => {
+            section.el.classList.add('hidden');
+            section.requiredIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.required = false;
+            });
+        });
+    }
+
+    function populateComparisonColumn(colId, quote, label) {
+        const fmt = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const col = document.getElementById(colId);
+        col.querySelector('.comp-label').textContent = label;
+        col.querySelector('.comp-name').textContent = quote.name;
+        col.querySelector('.comp-type').textContent = quote.type;
+        col.querySelector('.comp-monthly').textContent = fmt(quote.monthly) + '/mo';
+        col.querySelector('.comp-annual').textContent = fmt(quote.monthly * 12) + '/yr';
+
+        const tbody = col.querySelector('.comp-tbody');
+        tbody.innerHTML = '';
+        quote.breakdown.forEach(({ factor, info, impact, cls }) => {
+            addBreakdownRow(tbody, factor, info, impact);
+            if (cls) tbody.lastElementChild.lastElementChild.className = cls;
+        });
+    }
+
+    function showComparison(q1, q2) {
+        populateComparisonColumn('comp-col-1', q1, 'Quote 1');
+        populateComparisonColumn('comp-col-2', q2, 'Quote 2');
+
+        if (q1.type === q2.type) {
+            const rows1 = document.querySelectorAll('#comp-col-1 .comp-tbody tr');
+            const rows2 = document.querySelectorAll('#comp-col-2 .comp-tbody tr');
+            const len = Math.min(q1.breakdown.length, q2.breakdown.length);
+            for (var i = 0; i < len; i++) {
+                if (q1.breakdown[i].info !== q2.breakdown[i].info) {
+                    rows1[i].classList.add('table-warning');
+                    rows2[i].classList.add('table-warning');
+                }
+            }
+        }
+
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('quoteComparison').classList.remove('d-none');
+        document.getElementById('quoteComparison').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function showResult(name, type, monthly, breakdown) {
+        lastQuoteData = { name, type, monthly, breakdown };
+
+        if (savedQuote) {
+            showComparison(savedQuote, lastQuoteData);
+            savedQuote = null;
+            return;
+        }
+
         const fmt = n => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
         document.getElementById('resultName').textContent = name;
@@ -410,24 +471,37 @@ document.addEventListener('DOMContentLoaded', function () {
             if (cls) tbody.lastElementChild.lastElementChild.className = cls;
         });
 
+        document.getElementById('quoteComparison').classList.add('d-none');
         document.getElementById('quoteResult').classList.remove('d-none');
         document.getElementById('quoteResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // --- Event listeners ---
 
+    document.getElementById('compareQuotes').addEventListener('click', function () {
+        savedQuote = lastQuoteData;
+        document.getElementById('quoteResult').classList.add('d-none');
+        document.getElementById('comparison-banner').classList.remove('d-none');
+        resetForm();
+        quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
     document.getElementById('getAnotherQuote').addEventListener('click', function () {
-        quoteForm.reset();
-        clearAllErrors();
-        Object.values(sections).forEach(section => {
-            section.el.classList.add('hidden');
-            section.requiredIds.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.required = false;
-            });
-        });
+        savedQuote = null;
+        lastQuoteData = null;
         document.getElementById('quoteResult').classList.add('d-none');
         document.getElementById('resultBreakdown').innerHTML = '';
+        document.getElementById('comparison-banner').classList.add('d-none');
+        resetForm();
+        quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('newComparison').addEventListener('click', function () {
+        savedQuote = null;
+        lastQuoteData = null;
+        document.getElementById('quoteComparison').classList.add('d-none');
+        document.getElementById('comparison-banner').classList.add('d-none');
+        resetForm();
         quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
