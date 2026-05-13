@@ -659,7 +659,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     drivingRecord: document.getElementById('drivingRecord').value,
                     coverageLevel: document.querySelector('input[name="autoCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data), buildAutoBreakdown(data));
             } else if (insuranceType === 'home') {
                 Object.assign(data, {
                     fullName: document.getElementById('homeFullName').value,
@@ -673,7 +672,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     fireSprinklers: document.getElementById('fireSprinklers').checked,
                     coverageLevel: document.querySelector('input[name="homeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data), buildHomeBreakdown(data));
             } else if (insuranceType === 'life') {
                 Object.assign(data, {
                     fullName: document.getElementById('lifeFullName').value,
@@ -686,10 +684,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     preexistingConditions: document.getElementById('preexistingConditions').checked,
                     coverageLevel: document.querySelector('input[name="lifeCoverageLevel"]:checked')?.value,
                 });
-                showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data), buildLifeBreakdown(data));
             }
 
             console.log('Quote Form Submitted:', data);
+
+            var submitBtn = quoteForm.querySelector('[type="submit"]');
+            var spinner = document.getElementById('quoteSpinner');
+            submitBtn.disabled = true;
+            spinner.classList.remove('d-none');
+            spinner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            setTimeout(function () {
+                spinner.classList.add('d-none');
+                submitBtn.disabled = false;
+
+                if (insuranceType === 'auto') {
+                    showResult(data.fullName, 'Auto Insurance', calculateAutoQuote(data), buildAutoBreakdown(data));
+                } else if (insuranceType === 'home') {
+                    showResult(data.fullName, 'Home Insurance', calculateHomeQuote(data), buildHomeBreakdown(data));
+                } else if (insuranceType === 'life') {
+                    showResult(data.fullName, 'Life Insurance', calculateLifeQuote(data), buildLifeBreakdown(data));
+                }
+            }, 1500);
         });
     }
 });
