@@ -400,6 +400,30 @@ document.addEventListener('DOMContentLoaded', function () {
     let compQ1 = null;
     let compQ2 = null;
 
+    function setStep(n) {
+        var stepsEl = document.getElementById('quoteSteps');
+        if (!stepsEl) return;
+        stepsEl.classList.remove('d-none');
+        for (var i = 1; i <= 3; i++) {
+            var item = document.getElementById('step' + i);
+            if (!item) continue;
+            var circle = item.querySelector('.step-circle');
+            item.classList.remove('active', 'completed');
+            if (i < n) {
+                item.classList.add('completed');
+                circle.textContent = '✓';
+            } else {
+                circle.textContent = i;
+                if (i === n) item.classList.add('active');
+            }
+            item.setAttribute('aria-current', i === n ? 'step' : 'false');
+        }
+        var conn1 = document.getElementById('step-conn-1');
+        var conn2 = document.getElementById('step-conn-2');
+        if (conn1) conn1.classList.toggle('completed', n > 1);
+        if (conn2) conn2.classList.toggle('completed', n > 2);
+    }
+
     function resetForm() {
         quoteForm.reset();
         clearAllErrors();
@@ -413,6 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var saveBtn = document.getElementById('saveQuote');
         saveBtn.textContent = 'Save Quote';
         saveBtn.disabled = false;
+        setStep(1);
     }
 
     function populateComparisonColumn(colId, quote, label) {
@@ -460,6 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         document.getElementById('quoteResult').classList.add('d-none');
         document.getElementById('quoteComparison').classList.remove('d-none');
+        document.getElementById('quoteSteps').classList.add('d-none');
         document.getElementById('quoteComparison').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
@@ -487,6 +513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.getElementById('quoteComparison').classList.add('d-none');
+        setStep(3);
         var resultEl = document.getElementById('quoteResult');
         resultEl.classList.remove('d-none');
         resultEl.classList.remove('animate-in');
@@ -667,7 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
         compQ2 = null;
         document.getElementById('quoteComparison').classList.add('d-none');
         document.getElementById('comparison-banner').classList.add('d-none');
-        resetForm();
+        resetForm(); // calls setStep(1) and shows #quoteSteps
         quoteForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
@@ -675,6 +702,7 @@ document.addEventListener('DOMContentLoaded', function () {
         radio.addEventListener('change', function () {
             showSection(this.value);
             clearAllErrors();
+            setStep(2);
         });
     });
 
